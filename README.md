@@ -8,7 +8,13 @@ It is a transformer that doesn't simply learn -- it **learns what to forget**, a
 
 Built as a direct exntesion to my MSc Dissertation at St Andrews : `Practical Variational Inference of Bayesian Neural Networks`, BayesGPT-I is the decoder version of the Variational Dropout-enhanced Transformer Network in my dissertation. 
 
-Trained on Philip K. Dick and two Project Gutenberg novels. Naturally, slightly paranoid about its own weights.
+
+The pretrained model was trained on:
+- *The Golden Man* —- Philip K. Dick
+- *Lone Star Planet* —- John J. McGuire
+- *At the mountains of Madness* -- H.P. Lovecraft
+
+ Naturally, slightly paranoid about its own weights and overwhelmed by lovecraftian cosmi horror at complex inputs. 
 
 ---
 
@@ -98,7 +104,6 @@ correctly at any scale -- the model knows what it doesn't know.
 
 ```
 Input tokens  (1, T, B)
-      |
 
 Embed                            <- learned token embeddings
       ↓
@@ -181,16 +186,12 @@ cd BayesGPT-I
 # 2. Install dependencies
 julia --project=. -e 'using Pkg; Pkg.instantiate()'
 
-# 3. Download pretrained weights (trained on PKD + 2 Gutenberg novels)
+# 3. Download pretrained weights (trained on Gutenberg novels)
 # model.bson and tokenizer.bson are included in the repo
 
 # 4. Generate immediately
 julia --project=. generate_only.jl
 ```
-
-The pretrained model was trained on:
-- *The Defenders* —- Philip K. Dick
-- Two Project Gutenberg novels
 
 Vocabulary size: **3,476 words** | Parameters: **613,524**
 
