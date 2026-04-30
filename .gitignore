@@ -1,0 +1,11 @@
+# Julia
+Manifest.toml
+*.ji
+*.so
+*.dylib
+
+# Training data (copyright)
+data/*.txt
+
+# OS
+.DS_Store
