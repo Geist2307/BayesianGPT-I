@@ -3,9 +3,7 @@ using Flux, NNlib, Statistics, Functors, Unicode, DataStructures, Random, BSON
 using Printf
 
 include("src/layers.jl")
-include("src/attention.jl")
 include("src/attention_causal.jl")
-include("src/transformer.jl")
 include("src/transformer_decoder.jl")
 include("src/tokenizer_decoder.jl")
 include("src/generate.jl")

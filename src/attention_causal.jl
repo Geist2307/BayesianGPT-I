@@ -12,6 +12,8 @@
 
 using NNlib: batched_mul
 using Flux: softmax, Dense
+using LinearAlgebra: tril
+
 
 
 # ------------------
@@ -108,7 +110,7 @@ function multi_head_scaled_dot_attention_causal(
     Kh = to_heads(K)
     Vh = to_heads(V)
 
-    attn_out  = scaled_dot_attention(Qh, Kh, Vh)
+    attn_out = scaled_dot_attention_causal(Qh, Kh, Vh)
     attn_out  = permutedims(attn_out, [1, 3, 2, 4])
     reshape(attn_out, dm, size(attn_out, 3), size(attn_out, 4))
 end
@@ -163,7 +165,8 @@ function (mha::CausalMultiheadAttention)(
     Q = mha.denseQ(query)
     K = mha.denseK(key)
     V = mha.denseV(value)
-    attn_out = multi_head_scaled_dot_attention(mha.nhead, Q, K, V)
+    attn_out = multi_head_scaled_dot_attention_causal(mha.nhead, Q, K, V)
+
     mha.denseO(attn_out)
 end
 
