@@ -229,6 +229,16 @@ Token uncertainty (σ) and 95% CI:
   Mean uncertainty : 0.314
 ```
 
+## Interactive Demo
+
+The project comes with a julia app, where you can add your input directly into the window and select params.
+
+Run locally with:
+```bash
+julia --project=. app.jl
+```
+Then open `http://localhost:8080`
+
 ## Project Structure
 
 ```

@@ -173,7 +173,7 @@ end
 
 # Forward pass (3-D batch: embed_dim × seq_len × batch)
 function (layer::VariationalDropoutMolchanov)(x::AbstractArray{<:Real, 3})
-    map(b -> layer(view(x, :, :, b)), 1:size(x, 3)) |>
+    map(b -> layer(Base.view(x, :, :, b)), 1:size(x, 3)) |>
         slices -> cat(slices...; dims = 3)
 end
 

@@ -46,7 +46,7 @@ end
 
 # ----------------
 # Sparsity  
----------------
+# ---------------
 
 const SPARSITY_THRESHOLD_α = 3.0f0 # threshold from Molchanov et al. (2017)
 
