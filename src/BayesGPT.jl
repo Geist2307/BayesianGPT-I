@@ -8,7 +8,6 @@ using Unicode
 using DataStructures
 using Random
 using Printf
-using Adapt
 
 include("layers.jl")
 include("attention_causal.jl")

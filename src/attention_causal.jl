@@ -12,7 +12,7 @@
 
 using NNlib: batched_mul
 using Flux: softmax, Dense
-using LinearAlgebra: tril
+using LinearAlgebra: tril, triu
 
 
 
@@ -37,10 +37,11 @@ Example for N=4:
     0     0     0     0
 """
 function causal_mask(N::Int, T::Type)
-    mask = fill(typemin(T), N, N)          # -Inf everywhere
-    mask[tril(trues(N, N))] .= zero(T)    # zero on/below diagonal
-    mask
+    upper = triu(fill(typemin(T), N, N), 1)  # upper triangle = -Inf
+    lower = tril(zeros(T, N, N))              # lower triangle = 0
+    upper .+ lower
 end
+
 
 
 # ---------------------------------
@@ -70,7 +71,7 @@ H and B along. This function actually receives Q, K, V after splitting them into
 mask ensures tokens are applied to positions <=t
 """
 function scaled_dot_attention_causal(
-        Q::A, K::A, V::A) where {T, A <: AbstractArray{T, 4}}
+        Q::A, K::A, V::A) where {T, A <: AbstractArray{T, 4}} # A is a 4D array with type T
     dh = size(Q, 1)
     N  = size(Q, 2)
 
@@ -79,6 +80,7 @@ function scaled_dot_attention_causal(
 
     # apply causal mask 
     # mask is (N, N) —- broadcast automatically over H and B
+    # only the weights of the previous words are considered
     mask  = causal_mask(N, T)
     score = score .+ mask                                       # (N, N, H, B)
 
@@ -99,9 +101,12 @@ Identical to `multi_head_scaled_dot_attention` but calls
 """
 function multi_head_scaled_dot_attention_causal(
         nhead::Int, Q::A, K::A, V::A) where {T, A <: AbstractArray{T, 3}}
-    dm = size(Q, 1)
-    dh = dm ÷ nhead
+    dm = size(Q, 1) # embedding dim 
+    dh = dm ÷ nhead # embedding dim per head
 
+
+    # reshape and permute: dh, nhead, N -> dh, N, nhead
+    # prepares for scaled_dot_attention
     to_heads(X) = permutedims(
         reshape(X, dh, nhead, size(X, 2), size(X, 3)),
         [1, 3, 2, 4])
@@ -138,6 +143,8 @@ end
 
 Flux.@layer :ignore CausalMultiheadAttention trainable=(denseQ, denseK, denseV, denseO)
 
+# method overloading -- julia calls the appropriate one (per head, or per total)
+# no conditional logic
 function CausalMultiheadAttention(nhead::Int, dim_model::Int, dim_head::Int, dim_out::Int)
     CausalMultiheadAttention(
         nhead,
@@ -159,7 +166,8 @@ Base.show(io::IO, mha::CausalMultiheadAttention) =
               "head_dim=$(size(mha.denseQ.weight,1) ÷ mha.nhead), " *
               "$(size(mha.denseQ.weight,2))⇒$(size(mha.denseO.weight,1)))")
 
-# Forward pass (batched 3-D) -------------------------
+# Forward pass (batched 3-D) 
+# Q, K, V are separate linear (Dense) layers
 function (mha::CausalMultiheadAttention)(
         query::A, key::A, value::A) where {T, A <: AbstractArray{T, 3}}
     Q = mha.denseQ(query)

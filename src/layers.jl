@@ -21,7 +21,9 @@ speeding up things every loop. Much better performance than Python.
 # Shape
 - Input  : `(seq_len, batch_size)` – integer token ids
 - Output : `(embed_dim, seq_len, batch_size)`
+
 """
+
 struct Embed{W <: AbstractArray}
     weight::W
 end
@@ -137,17 +139,6 @@ end
 
 @functor VariationalDropoutMolchanov
 
-# GPU compatibility 
-import Adapt
-
-function Adapt.adapt_structure(to, layer::VariationalDropoutMolchanov)
-    VariationalDropoutMolchanov(
-        Adapt.adapt(to, layer.θ),
-        Adapt.adapt(to, layer.logσ2),
-        Adapt.adapt(to, layer.bias),
-        layer.activation
-    )
-end
 
 # Constructor
 function VariationalDropoutMolchanov(
@@ -173,8 +164,20 @@ end
 
 # Forward pass (3-D batch: embed_dim × seq_len × batch)
 function (layer::VariationalDropoutMolchanov)(x::AbstractArray{<:Real, 3})
-    map(b -> layer(Base.view(x, :, :, b)), 1:size(x, 3)) |>
-        slices -> cat(slices...; dims = 3)
+
+    # get dimensions from input
+    dm, T, B = size(x)
+
+    x_2d = reshape(x, dm, T*B)
+
+    ϵ  = randn(Float32, size(layer.θ))
+
+    W    = @. layer.θ + exp(0.5f0 * layer.logσ2) * ϵ
+    out  = layer.activation.(W * x_2d .+ layer.bias)
+    reshape(out, size(out, 1), T, B)
+
+
+   
 end
 
 

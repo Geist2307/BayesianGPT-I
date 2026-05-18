@@ -95,7 +95,7 @@ function decoder_energy_loss(
 
     # forward pass---------------------
     # X : (1, T, B) → model → (vocab_size, T, B)
-    ŷ = hcat([model(X[:, :, i]) for i in axes(X, 3)]...)  
+    ŷ = model(X) 
 
     vocab_size = size(ŷ, 1)
     T          = size(X, 2)
@@ -133,7 +133,7 @@ function token_accuracy(model, loader)
     total   = 0
 
     for (X, Y) in loader
-        ŷ = hcat([model(X[:, :, i]) for i in axes(X, 3)]...)
+        ŷ = model(X)
         # predicted token at each position = argmax over vocab
         pred = vec(mapslices(argmax, ŷ; dims = 1))  # (T*B,)
         true_ids = vec(Y)                            # (T*B,)
@@ -164,7 +164,7 @@ function evaluate_decoder(model, loader; N_total::Int, kl_scale::Float32 = 1.0f0
     for (X, Y) in loader
         total_loss += decoder_energy_loss(model, X, Y, N_total; kl_scale)
 
-        ŷ = hcat([model(X[:, :, i]) for i in axes(X, 3)]...)
+        ŷ = model(X)
         pred     = vec(mapslices(argmax, ŷ; dims = 1))
         true_ids = vec(Y)
         correct += sum(pred .== true_ids)
@@ -237,17 +237,17 @@ function train_decoder!(
     opt_state = Flux.setup(Adam(lr), model)
 
     # total number of tokens in training set
-    N_total = sum(size(X, 2) * size(X, 3) for (X, _) in train_loader)
+    N_train = sum(size(X, 2) * size(X, 3) for (X, _) in train_loader)
+    N_val   = sum(size(X, 2) * size(X, 3) for (X, _) in val_loader)
 
     for epoch in 1:epochs
         β = kl_schedule(epoch)
 
         Flux.train!(model, train_loader, opt_state) do m, X, Y
-            decoder_energy_loss(m, X, Y, N_total; kl_scale = Float32(β))
+            decoder_energy_loss(m, X, Y, N_train; kl_scale = Float32(β))
         end
 
-        N_train = sum(size(X, 2) * size(X, 3) for (X, _) in train_loader)
-        N_val   = sum(size(X, 2) * size(X, 3) for (X, _) in val_loader)
+
 
         tr = evaluate_decoder(model, train_loader; N_total = N_train, kl_scale = Float32(β))
         vl = evaluate_decoder(model, val_loader;   N_total = N_val,   kl_scale = Float32(β))

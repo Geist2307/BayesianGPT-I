@@ -16,6 +16,7 @@ using DataStructures
 using Flux: DataLoader, onehotbatch
 
 
+
 # -----------------------------------
 # Text normalisation 
 # ---------------------------------
@@ -40,9 +41,20 @@ end
 Read a plain .txt file and return a vector of non-empty lines.
 Each line is treated as one document (sentence / paragraph).
 """
-function read_corpus(path::AbstractString)
-    lines = readlines(path)
-    filter(!isempty, strip.(lines))
+function read_corpus(path::AbstractString; min_chars::Int = 200)
+	
+    text = read(path, String)
+    
+    # strip Gutenberg boilerplate
+    start_match = findfirst(r"\*\*\* START OF.*?\*\*\*", text)
+    end_match   = findfirst(r"\*\*\* END OF.*?\*\*\*", text)
+    if start_match !== nothing && end_match !== nothing
+        text = text[last(start_match)+1 : first(end_match)-1]
+    end
+    
+    # split into paragraphs and filter short ones
+    paragraphs = split(text, r"\n\s*\n")
+    filter(p -> length(strip(p)) >= min_chars, strip.(paragraphs))
 end
 
 
@@ -85,8 +97,14 @@ end
 
 
 # ────────────────────────────────────────────────────────────
-# IndexTokenizer  (unchanged)
+# IndexTokenizer 
 # ────────────────────────────────────────────────────────────
+"""
+    Bidirectional tokenizer. Encoders words to position in the vocab vector.
+The struct allows us to define the data structure for the tokenizer and 
+saves time at runtime. 
+
+"""
 
 struct IndexTokenizer{T}
     vocabulary :: Vector{T}
@@ -118,12 +136,18 @@ end
 # Document preprocessing  (unchanged)
 # ────────────────────────────────────────────────────────────
 
+"""
+    Applies to exactly one doc to tokenizer per word
+Uses the tokenizer we defined before to return the 
+ tokens (words) per document.
+"""
+
 function preprocess(
         document::AbstractString,
         tokenizer;
         pattern    :: Regex               = r"\w\w+\b",
         max_length :: Union{Nothing, Int} = nothing,
-        transform                         = simplify)
+        transform                         = simplify) # the only transforms is simplify 
 
     words  = [m.match for m in eachmatch(pattern, transform(document))]
     tokens = tokenizer(words)
@@ -138,6 +162,10 @@ end
 # ----------------------------
 # Padding  
 # --------------------------------
+
+"""
+    Padding ensures we have sequences of the same length.
+"""
 
 function pad_sequences(sequences, max_length::Int, pad_idx::Int)
     padded = fill(pad_idx, max_length, length(sequences))
@@ -165,6 +193,7 @@ Split a token sequence into input/target pairs shifted by one:
 This is the core of next-token prediction: given X[t], predict Y[t].
 """
 function make_pairs(tokens::Vector{Int})
+
     X = tokens[1:end-1]
     Y = tokens[2:end]
     X, Y
@@ -198,7 +227,8 @@ function create_batches(
         corpus    :: AbstractVector{<:AbstractString},
         tokenizer :: IndexTokenizer;
         batch_size :: Int = 32,
-        max_length :: Int = 128)
+        max_length :: Int = 128,
+        min_length :: Int = 10)
 
     pad_idx = tokenizer.lookup["<PAD>"]
 
@@ -207,7 +237,7 @@ function create_batches(
 
     for doc in corpus
         tokens = preprocess(doc, tokenizer; max_length = max_length + 1)
-        length(tokens) < 2 && continue       # skip too-short documents
+        length(tokens) < min_length && continue       # skip too-short documents
 
         X, Y = make_pairs(tokens)
         push!(all_X, X)

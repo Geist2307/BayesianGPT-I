@@ -9,12 +9,29 @@ It is a transformer that doesn't simply learn -- it **learns what to forget**, a
 Built as a direct exntesion to my MSc Dissertation at St Andrews : `Practical Variational Inference of Bayesian Neural Networks`, BayesGPT-I is the decoder version of the Variational Dropout-enhanced Transformer Network in my dissertation. 
 
 
-The pretrained model was trained on:
+The pretrained model was trained on 11 free works from project Guthenberg(included in the data folder)
+The works include:
 - *The Golden Man* —- Philip K. Dick
 - *Lone Star Planet* —- John J. McGuire
 - *At the mountains of Madness* -- H.P. Lovecraft
 
- Naturally, slightly paranoid about its own weights and overwhelmed by lovecraftian cosmi horror at complex inputs. 
+**Main trade-offs**
+
+1. Word-level (naive) tokenization : this ensures training is made to predict next "word", still rendering human-like sentences. NOT using BytePair, as this would substantially increase the number of "classes" to predict over. For CPU training and demonstration we want reasonable training times.
+
+2. Short texts are excluded for training data. I focus on context-rich paragraphs that are at least 200 characters long. This means many shorter senteces from the sources are excluded, the model learning from a variety of styles and focusing on quality paragraphs
+
+3. 64 embedding length is a practical choice to speed up training. It can be set freely with more compute power.
+
+4. The model is a one-layer Transformer model:  exactly one Multihead Attention layers & one two-layered Variational MLP(the latter is the Bayesian/Variational part). This is the simplest model possibly, chosen because (i) the corpus of data is small and (ii) speeding up training.
+
+**Model properties**
+
+- vocab size : 16330
+- total parameters : 2271690
+
+By comparison, [GPT-3](https://en.wikipedia.org/wiki/GPT-3) has 175 billion parameters. Hence `BayesGPT-I` is 0.0013% of GPT3 size. A true experiment would train it at scale, which is impossible with one machine. 
+
 
 ---
 
@@ -26,7 +43,7 @@ A standard GPT learns **point estimates** for its weights:
 W = 0.73   ← this weight is exactly 0.73, always
 ```
 
-BayesGPT-I learns **distributions** over its MLP weights:
+BayesGPT-I learns **an approximate distributions** over its MLP weights:
 
 ```
 W ~ N(0.73, σ²)   ← this weight is probably around 0.73, but uncertain
@@ -39,11 +56,19 @@ This single change gives you three things for free:
 The ELBO loss simultaneously fits the data and removes unnecessary weights:
 
 ```
-L = fit the data  +  β · don't be more complex than you need to be
+L = N * NLL  +  β · 1/N * KL
 ```
 
 Weights the model is uncertain about get pruned automatically.
-No separate pruning step. No hand-tuned regularisation. Just Bayes.
+No separate pruning step, as each distribution over each weight has a natural 
+SNR ratio, which can actually be expressed as a logarithm :
+
+```
+logα = logσ² - 2·log|θ|
+```
+
+If the standard deviation is too large with respect to the mean, distribution is safe to prune, as sampling from it
+will actually be just noise. We use a heuristic `logα = 3` as this already means thestandard deviation is ~20 times greater than the mean. 
 
 **2. Honest uncertainty at generation time**
 
@@ -67,16 +92,25 @@ BayesGPT-I says "her" with σ=0.35 — honestly uncertain.
 
 ## Results
 
-Trained on ~7,700 lines from 3 books (Philip K. Dick + Project Gutenberg).
-613K parameters, 50 epochs, CPU only (Apple M2, ~12 hours).
+Trained on ~8663 lines from only 11 sources.
+2.27 million parameters, 50 epochs, CPU only (Apple M2, ~2 hours).
+
+The train-validation split is 90% - 10%. 
+
+I used a "warmup" phase where the KL divergence is linearly introduced over 30 epochs : from 0 to 1/N * KL (scaled by the data length)
 
 ```
 Final metrics:
-  train_acc        : 0.998
-  val_acc          : 0.992
+  train_acc        : 0.987
+  val_acc          : 0.968
   sparsity_dense1  : 0.008
   sparsity_dense2  : 0.010
 ```
+
+**Observations**
+
+- some overfitting, as the gap between training and validation accuracy widens. 
+- not much accuracy gain after 44 epochs, hence 50 epochs is ideal. 
 
 **Three generation modes, same seed:**
 
@@ -94,9 +128,10 @@ Bayesian (20 passes):  "he knows thing menace room"
 **An honest finding:**
 
 Sparsity stayed low (~1%) because the model is not overparameterised
-relative to 3 books. With a larger model or more data, the KL term
-would prune more aggressively. The uncertainty signal however works
-correctly at any scale -- the model knows what it doesn't know.
+relative to 11 books. With a larger model or more data, the KL term
+would prune more aggressively -- this remains to be tested!.
+The uncertainty signal however works
+correctly at any scale.  The model knows what it doesn't know.
 
 ---
 
@@ -123,9 +158,15 @@ Dense(embed_dim, vocab_size)     ← logits at every position
 Output  (vocab_size, T, B)
 ```
 
-Only the MLP layers inside each decoder block are Bayesian.
-Attention weights are standard point estimates — a deliberate choice:
-attention learns *routing* (hard to prune), MLP learns *knowledge* (safe to prune).
+Only the MLP layers inside each decoder block are Bayesian. Hence, the  variational dropout layers
+are actually inside MLP, as we still use regular dropout outside. 
+Hence, attention weights are standard point estimates. This is a deliberate choice:
+
+
+- attention learns *routing*, which can be dangerous to prune
+-  MLP learns *knowledge* (safe to prune).
+
+This is a surgically-modified GPT, with emphasis on its MLP. 
 
 ---
 
@@ -174,6 +215,16 @@ julia --project=. generate_only.jl
 
 ---
 
+## Start the notebook for data exploration
+
+From the root folder (where `Project.toml` is) run :
+
+```bash
+julia --project=. --threads auto -e 'using Pluto; Pluto.run()'
+```
+
+Then create new notebook or select existing one. This allows clear EDA for content, which can inform different tokenization strategies. 
+
 ## Try the Pretrained Model
 
 Training on CPU can take a very long time? Download the pretrained weights and generate immediately:
@@ -192,8 +243,6 @@ julia --project=. -e 'using Pkg; Pkg.instantiate()'
 # 4. Generate immediately
 julia --project=. generate_only.jl
 ```
-
-Vocabulary size: **3,476 words** | Parameters: **613,524**
 
 Try these seeds out of the box:
 
@@ -257,24 +306,6 @@ BayesGPT-I/
 └── data/                       # put your .txt files here
 ```
 
----
-
-## Key Hyperparameters
-
-```julia
-embed_dim  = 64       # embedding dimension
-n_heads    = 4        # attention heads
-hidden_dim = 256      # MLP hidden dimension (4 × embed_dim)
-n_layers   = 2        # number of decoder blocks
-max_length = 128      # context window
-batch_size = 32
-epochs     = 50
-lr         = 1e-3
-
-# Bayesian
-kl_schedule(epoch) = min(1.0f0, epoch / 30f0)   # warm-up over 30 epochs
-SPARSITY_THRESHOLD = 3.0f0                        # logα ≥ 3 → pruned
-```
 
 ---
 
