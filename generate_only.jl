@@ -19,13 +19,13 @@ println("Model loaded ✓")
 # generate
 
 # ── standard (shows repetition problem) ──────────────────────
-generate_samples(model, tokenizer, "the ancient horror";
-                 n_samples=3, max_length=3, temperature=0.8f0)
+generate_samples(model, tokenizer, "What am I supposed to do now?";
+                 n_samples=5, max_length=20, temperature=1.5f0)
 
-generate_samples_topk(model, tokenizer, "the ancient horror";
-                      n_samples=3, max_length=3, temperature=0.8f0, 
-                      k=50, penalty=1.5f0)
+generate_samples_topk(model, tokenizer, "What am I supposed to do now?";
+                      n_samples=5, max_length=20, temperature=1.5f0, 
+                      k=50, penalty=3.0f0)
 
-bayesian_generate_report(model, tokenizer, "the ancient horror";
-                         n_forward=20, max_length=5, temperature=0.8f0,
-                         k=50, penalty=1.5f0)
+bayesian_generate_report(model, tokenizer, "What am I supposed to do now?";
+                         n_forward=200, max_length=20, temperature=1.5f0,
+                         k=50, penalty=3.0f0)

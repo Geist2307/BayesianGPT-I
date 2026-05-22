@@ -1,0 +1,70 @@
+  Activating project at `~/Documents/BayesGPT-I`
+Precompiling project...
+   2119.9 ms  ✓ BayesGPT
+  1 dependency successfully precompiled in 4 seconds. 363 already precompiled.
+Total lines: 8607
+Files loaded: ["input.txt", "input10.txt", "input11.txt", "input2.txt", "input3.txt", "input4.txt", "input5.txt", "input6.txt", "input7.txt", "input8.txt", "input9.txt"]
+Vocab size: 5412
+Total parameters: 7
+Epoch 1 / 50 | β=0.05 | train_loss=7.608743e8 | train_acc=0.183 | val_acc=0.177 | sparsity_dense1=0.016 | sparsity_dense2=0.016
+Epoch 2 / 50 | β=0.1 | train_loss=6.7266656e8 | train_acc=0.183 | val_acc=0.177 | sparsity_dense1=0.017 | sparsity_dense2=0.016
+Epoch 3 / 50 | β=0.15 | train_loss=6.403244e8 | train_acc=0.223 | val_acc=0.218 | sparsity_dense1=0.015 | sparsity_dense2=0.016
+Epoch 4 / 50 | β=0.2 | train_loss=6.0801434e8 | train_acc=0.286 | val_acc=0.282 | sparsity_dense1=0.016 | sparsity_dense2=0.016
+Epoch 5 / 50 | β=0.25 | train_loss=5.764253e8 | train_acc=0.336 | val_acc=0.333 | sparsity_dense1=0.015 | sparsity_dense2=0.017
+Epoch 6 / 50 | β=0.3 | train_loss=5.458546e8 | train_acc=0.384 | val_acc=0.38 | sparsity_dense1=0.016 | sparsity_dense2=0.016
+Epoch 7 / 50 | β=0.35 | train_loss=5.1761014e8 | train_acc=0.416 | val_acc=0.415 | sparsity_dense1=0.016 | sparsity_dense2=0.015
+Epoch 8 / 50 | β=0.4 | train_loss=4.9286678e8 | train_acc=0.442 | val_acc=0.442 | sparsity_dense1=0.015 | sparsity_dense2=0.015
+Epoch 9 / 50 | β=0.45 | train_loss=4.6836813e8 | train_acc=0.473 | val_acc=0.474 | sparsity_dense1=0.016 | sparsity_dense2=0.016
+Epoch 10 / 50 | β=0.5 | train_loss=4.4591754e8 | train_acc=0.501 | val_acc=0.501 | sparsity_dense1=0.016 | sparsity_dense2=0.016
+Epoch 11 / 50 | β=0.55 | train_loss=4.259817e8 | train_acc=0.525 | val_acc=0.525 | sparsity_dense1=0.016 | sparsity_dense2=0.015
+Epoch 12 / 50 | β=0.6 | train_loss=4.0719763e8 | train_acc=0.541 | val_acc=0.542 | sparsity_dense1=0.016 | sparsity_dense2=0.015
+Epoch 13 / 50 | β=0.65 | train_loss=3.8856947e8 | train_acc=0.56 | val_acc=0.56 | sparsity_dense1=0.016 | sparsity_dense2=0.016
+Epoch 14 / 50 | β=0.7 | train_loss=3.717702e8 | train_acc=0.579 | val_acc=0.579 | sparsity_dense1=0.016 | sparsity_dense2=0.015
+Epoch 15 / 50 | β=0.75 | train_loss=3.549901e8 | train_acc=0.595 | val_acc=0.594 | sparsity_dense1=0.015 | sparsity_dense2=0.015
+Epoch 16 / 50 | β=0.8 | train_loss=3.3795094e8 | train_acc=0.613 | val_acc=0.61 | sparsity_dense1=0.015 | sparsity_dense2=0.016
+Epoch 17 / 50 | β=0.85 | train_loss=3.2175514e8 | train_acc=0.628 | val_acc=0.626 | sparsity_dense1=0.015 | sparsity_dense2=0.016
+Epoch 18 / 50 | β=0.9 | train_loss=3.0586054e8 | train_acc=0.645 | val_acc=0.642 | sparsity_dense1=0.015 | sparsity_dense2=0.015
+Epoch 19 / 50 | β=0.95 | train_loss=2.9000637e8 | train_acc=0.661 | val_acc=0.659 | sparsity_dense1=0.016 | sparsity_dense2=0.015
+Epoch 20 / 50 | β=1.0 | train_loss=2.742497e8 | train_acc=0.676 | val_acc=0.673 | sparsity_dense1=0.016 | sparsity_dense2=0.014
+Epoch 21 / 50 | β=1.0 | train_loss=2.5985197e8 | train_acc=0.691 | val_acc=0.688 | sparsity_dense1=0.016 | sparsity_dense2=0.015
+Epoch 22 / 50 | β=1.0 | train_loss=2.4549822e8 | train_acc=0.705 | val_acc=0.702 | sparsity_dense1=0.016 | sparsity_dense2=0.015
+Epoch 23 / 50 | β=1.0 | train_loss=2.3221413e8 | train_acc=0.718 | val_acc=0.715 | sparsity_dense1=0.015 | sparsity_dense2=0.015
+Epoch 24 / 50 | β=1.0 | train_loss=2.1985355e8 | train_acc=0.73 | val_acc=0.727 | sparsity_dense1=0.015 | sparsity_dense2=0.015
+Epoch 25 / 50 | β=1.0 | train_loss=2.072564e8 | train_acc=0.744 | val_acc=0.741 | sparsity_dense1=0.015 | sparsity_dense2=0.016
+Epoch 26 / 50 | β=1.0 | train_loss=1.9561838e8 | train_acc=0.755 | val_acc=0.752 | sparsity_dense1=0.015 | sparsity_dense2=0.015
+Epoch 27 / 50 | β=1.0 | train_loss=1.841275e8 | train_acc=0.767 | val_acc=0.764 | sparsity_dense1=0.015 | sparsity_dense2=0.015
+Epoch 28 / 50 | β=1.0 | train_loss=1.7375453e8 | train_acc=0.779 | val_acc=0.774 | sparsity_dense1=0.016 | sparsity_dense2=0.014
+Epoch 29 / 50 | β=1.0 | train_loss=1.6397178e8 | train_acc=0.789 | val_acc=0.785 | sparsity_dense1=0.016 | sparsity_dense2=0.014
+Epoch 30 / 50 | β=1.0 | train_loss=1.5466594e8 | train_acc=0.8 | val_acc=0.794 | sparsity_dense1=0.016 | sparsity_dense2=0.014
+Epoch 31 / 50 | β=1.0 | train_loss=1.456183e8 | train_acc=0.811 | val_acc=0.806 | sparsity_dense1=0.016 | sparsity_dense2=0.015
+Epoch 32 / 50 | β=1.0 | train_loss=1.3744734e8 | train_acc=0.821 | val_acc=0.815 | sparsity_dense1=0.016 | sparsity_dense2=0.014
+Epoch 33 / 50 | β=1.0 | train_loss=1.292064e8 | train_acc=0.83 | val_acc=0.824 | sparsity_dense1=0.016 | sparsity_dense2=0.014
+Epoch 34 / 50 | β=1.0 | train_loss=1.2168887e8 | train_acc=0.84 | val_acc=0.833 | sparsity_dense1=0.015 | sparsity_dense2=0.015
+Epoch 35 / 50 | β=1.0 | train_loss=1.14947704e8 | train_acc=0.848 | val_acc=0.841 | sparsity_dense1=0.016 | sparsity_dense2=0.015
+Epoch 36 / 50 | β=1.0 | train_loss=1.0762327e8 | train_acc=0.858 | val_acc=0.85 | sparsity_dense1=0.016 | sparsity_dense2=0.015
+Epoch 37 / 50 | β=1.0 | train_loss=1.0148853e8 | train_acc=0.865 | val_acc=0.857 | sparsity_dense1=0.016 | sparsity_dense2=0.015
+Epoch 38 / 50 | β=1.0 | train_loss=9.537584e7 | train_acc=0.873 | val_acc=0.865 | sparsity_dense1=0.016 | sparsity_dense2=0.015
+Epoch 39 / 50 | β=1.0 | train_loss=8.993643e7 | train_acc=0.881 | val_acc=0.871 | sparsity_dense1=0.016 | sparsity_dense2=0.015
+Epoch 40 / 50 | β=1.0 | train_loss=8.555437e7 | train_acc=0.885 | val_acc=0.876 | sparsity_dense1=0.016 | sparsity_dense2=0.015
+Epoch 41 / 50 | β=1.0 | train_loss=7.9382504e7 | train_acc=0.895 | val_acc=0.885 | sparsity_dense1=0.016 | sparsity_dense2=0.015
+Epoch 42 / 50 | β=1.0 | train_loss=7.501656e7 | train_acc=0.9 | val_acc=0.89 | sparsity_dense1=0.016 | sparsity_dense2=0.015
+Epoch 43 / 50 | β=1.0 | train_loss=7.095358e7 | train_acc=0.906 | val_acc=0.896 | sparsity_dense1=0.016 | sparsity_dense2=0.015
+Epoch 44 / 50 | β=1.0 | train_loss=6.6397896e7 | train_acc=0.913 | val_acc=0.903 | sparsity_dense1=0.016 | sparsity_dense2=0.016
+Epoch 45 / 50 | β=1.0 | train_loss=6.249232e7 | train_acc=0.918 | val_acc=0.909 | sparsity_dense1=0.016 | sparsity_dense2=0.016
+Epoch 46 / 50 | β=1.0 | train_loss=5.8986824e7 | train_acc=0.922 | val_acc=0.912 | sparsity_dense1=0.016 | sparsity_dense2=0.016
+Epoch 47 / 50 | β=1.0 | train_loss=5.559699e7 | train_acc=0.927 | val_acc=0.917 | sparsity_dense1=0.017 | sparsity_dense2=0.016
+Epoch 48 / 50 | β=1.0 | train_loss=5.2705584e7 | train_acc=0.931 | val_acc=0.921 | sparsity_dense1=0.017 | sparsity_dense2=0.016
+Epoch 49 / 50 | β=1.0 | train_loss=4.9293824e7 | train_acc=0.936 | val_acc=0.925 | sparsity_dense1=0.017 | sparsity_dense2=0.016
+Epoch 50 / 50 | β=1.0 | train_loss=4.6885668e7 | train_acc=0.939 | val_acc=0.928 | sparsity_dense1=0.017 | sparsity_dense2=0.016
+Model saved
+Model and tokenizer saved
+
+--- Generation ---
+
+Seed: "tell me about yourself"
+──────────────────────────────────────────────────
+Sample 1: tell me about yourself beebe tear pointed prepared hall filial clearly clearly gilded golden undoubtedly monstrous sometimes sometimes sometimes sometimes sometimes sometimes lives beloved mistress stained listening release masonry armitage obviously bonapartist occasional money trail bennet tongue fur cold planted felt felt felt felt
+Sample 2: tell me about yourself yourself elizabeth elizabeth elizabeth elizabeth elizabeth region more more more more more more more more more more more more more more more more more more more more more more more more more more more more more more more more more
+Sample 3: tell me about yourself popolo queen masonry conviction high high structure æon hickock hickock hickock disturbance reflection circumstance circumstance situated blue blue primal dust much much much much much much much much much much much much much much much much much much much much
+Sample 4: tell me about yourself yourself served came feared hour exercise swallowed charles garage inclined want want book shudder england ether supply sufferer broke broke broke broke broke broke broke frequent alarm alarm leaning leaning florence florence fear will will will will will will will
+Sample 5: tell me about yourself yourself yourself yourself yourself yourself responsible valentine under under lavish dead dead horse natural natural natural natural natural natural natural natural natural natural natural natural natural natural natural natural natural natural natural bending cast speech speech power comprehend baines porto

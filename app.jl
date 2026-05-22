@@ -32,8 +32,8 @@ route("/") do
     </head>
     <body>
         <h1>BayesGPT-I 🎲</h1>
-        <p>A minimal Bayesian GPT trained on PKD, Lovecraft and a space western.<br>
-        <em>Slightly paranoid about its own weights.</em></p>
+        <p>A minimal Bayesian GPT trained on 11 books, with 2.2M params and 16k vocabulary.<br>
+        <em>Delivers confidence in predictions (it knows when it doesn't know)</em></p>
 
         <form action="/generate" method="POST">
             <div class="label">Seed phrase</div>

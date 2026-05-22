@@ -54,7 +54,14 @@ function read_corpus(path::AbstractString; min_chars::Int = 200)
     
     # split into paragraphs and filter short ones
     paragraphs = split(text, r"\n\s*\n")
-    filter(p -> length(strip(p)) >= min_chars, strip.(paragraphs))
+    
+    # filter short AND any gutenberg boilerplate
+    filter(paragraphs) do p
+        p = strip(p)
+        length(p) >= min_chars &&
+        !occursin(r"gutenberg"i, p) &&
+        !occursin(r"project gutenberg"i, p)
+    end
 end
 
 
@@ -72,7 +79,7 @@ Returns a Vector{String} with <PAD> and <UNK> prepended.
 function select_vocabulary(
         corpus::AbstractVector{<:AbstractString};
         min_document_frequency :: Int    = 5,
-        pattern                :: Regex  = r"\w\w+\b",
+        pattern                :: Regex  = r"\w+\b",
         transform = simplify)
 
     doc_freq = DefaultDict{String, Int}(0)
@@ -145,7 +152,7 @@ Uses the tokenizer we defined before to return the
 function preprocess(
         document::AbstractString,
         tokenizer;
-        pattern    :: Regex               = r"\w\w+\b",
+        pattern    :: Regex               = r"\w+\b",
         max_length :: Union{Nothing, Int} = nothing,
         transform                         = simplify) # the only transforms is simplify 
 

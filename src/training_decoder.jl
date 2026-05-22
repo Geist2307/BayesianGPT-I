@@ -78,7 +78,7 @@ decoder_energy_loss(model, X, Y, N; kl_scale) → scalar
 
 Variational free energy for next-token prediction:
 
-    L = N · (1/N·T · Σ_t Σ_b NLL(ŷ[:,t,b], Y[t,b]))  +  β · KL/N
+    L = (1/N·T · Σ_t Σ_b NLL(ŷ[:,t,b], Y[t,b]))  +  β · KL
 
 where:
 - T = sequence length
@@ -115,7 +115,7 @@ function decoder_energy_loss(
     #  KL term --------------------------------------
     kl_sum = sum(kl(l) for l in get_variational_layers(model))
 
-    nll + kl_scale * (kl_sum / N)
+    nll + kl_scale * (kl_sum/ N)
 end
 
 
@@ -188,31 +188,16 @@ function evaluate_decoder(model, loader; N_total::Int, kl_scale::Float32 = 1.0f0
     )
 end
 
-
-# ---------------------------------------------
-# KL warmup schedule  (identical to training.jl)
-# ─--------------------------------------------
-
-"""
-We use 30 epochs as warmup for the linear schedule. The warmup
-period is a hyperparam that ensures the KL divergence term does 
-not dominate during the first epochs
-
-"""
-
-kl_schedule(epoch::Int) = min(1.0f0, epoch / 30f0)
-
-
 # ---------------------------------
 # Training loop
 # ----------------------------------------
 
 """
-    train_decoder!(model, train_loader, val_loader; epochs, kl_schedule, lr)
+    train_decoder!(model, train_loader, val_loader; epochs, kl_warmup_epochs, lr)
 
 Full training loop for next-token prediction with:
 - Adam optimiser
-- KL warm-up via `kl_schedule`
+- KL warm-up 
 - Per-epoch logging of loss, token accuracy, and MLP sparsity
 
 Returns a NamedTuple of training history vectors.
@@ -222,7 +207,7 @@ function train_decoder!(
         train_loader,
         val_loader;
         epochs      :: Int      = 10,
-        kl_schedule :: Function = kl_schedule,
+        kl_warmup_epochs :: Int = 5,
         lr          :: Float64  = 1e-3)
 
     history = (
@@ -241,7 +226,7 @@ function train_decoder!(
     N_val   = sum(size(X, 2) * size(X, 3) for (X, _) in val_loader)
 
     for epoch in 1:epochs
-        β = kl_schedule(epoch)
+        β = min(1.0f0, epoch / kl_warmup_epochs)
 
         Flux.train!(model, train_loader, opt_state) do m, X, Y
             decoder_energy_loss(m, X, Y, N_train; kl_scale = Float32(β))

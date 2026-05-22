@@ -59,7 +59,7 @@ end
 # ────────────────────────────────────────────────────────────
 
 function _tokenize_seed(tokenizer, seed::AbstractString)
-    words     = [m.match for m in eachmatch(r"\w\w+\b", simplify(seed))]
+    words     = [m.match for m in eachmatch(r"\w+\b", simplify(seed))]
     token_ids = tokenizer(words)
     if isempty(token_ids)
         @warn "Seed produced no known tokens, using <UNK>"

@@ -75,19 +75,27 @@ exactly three files
 
 # ╔═╡ 3aabaf33-ebaa-41b7-991d-b4c184279e20
 function read_corpus_new(path::AbstractString; min_chars::Int = 200)
-	
     text = read(path, String)
     
-    # strip Gutenberg boilerplate
+    # strip BOM
+    text = replace(text, "\ufeff" => "")
+    
+    # strip between gutenberg markers if present
     start_match = findfirst(r"\*\*\* START OF.*?\*\*\*", text)
     end_match   = findfirst(r"\*\*\* END OF.*?\*\*\*", text)
     if start_match !== nothing && end_match !== nothing
         text = text[last(start_match)+1 : first(end_match)-1]
     end
     
-    # split into paragraphs and filter short ones
     paragraphs = split(text, r"\n\s*\n")
-    filter(p -> length(strip(p)) >= min_chars, strip.(paragraphs))
+    
+    # filter short AND any gutenberg boilerplate
+    filter(paragraphs) do p
+        p = strip(p)
+        length(p) >= min_chars &&
+        !occursin(r"gutenberg"i, p) &&
+        !occursin(r"project gutenberg"i, p)
+    end
 end
 
 # ╔═╡ 8950fecd-7034-4bd2-90ac-8feb9f76d635
@@ -123,6 +131,19 @@ println("Total lines: $(length(corpus))")
 
 # ╔═╡ 98b36bee-192e-4360-9e48-f9cd938044e9
 println("Files loaded: $(filter(f -> endswith(f, ".txt"), readdir("data")))")
+
+# ╔═╡ 24049bf2-f347-4484-98ba-9fba5de2f759
+any(occursin("gutenberg", lowercase(p)) for p in corpus) |> println
+
+# ╔═╡ c09f2906-02a2-4cc6-9a0e-24974ed057b3
+begin
+	gutenberg_paragraphs = filter(p -> occursin(r"gutenberg"i, p), corpus)
+	println("Found in $(length(gutenberg_paragraphs)) paragraphs:")
+	for p in gutenberg_paragraphs
+	    println("─"^50)
+	    println(first(p, 200))  # first 200 chars of each
+	end
+end
 
 # ╔═╡ 998f204e-fbf3-4c00-9a61-a893afa613af
 md"""
@@ -1158,6 +1179,8 @@ exp(-Inf)
 # ╠═c7dda7f8-bb2e-4396-82d1-ad26085af609
 # ╠═95fb4cd5-57cc-4523-8cd4-cf23b132aee6
 # ╠═98b36bee-192e-4360-9e48-f9cd938044e9
+# ╠═24049bf2-f347-4484-98ba-9fba5de2f759
+# ╠═c09f2906-02a2-4cc6-9a0e-24974ed057b3
 # ╟─998f204e-fbf3-4c00-9a61-a893afa613af
 # ╟─21552fdb-ec7e-43ce-b2c2-e229b4df12f4
 # ╟─a47fc023-0eae-4045-98a6-9dd4d5283425

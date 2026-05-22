@@ -9,16 +9,17 @@ using BSON: @save
 # ==================
 # hyperparams
 # ===========================
-const MIN_DOC_FREQ  = 2
+const MIN_DOC_FREQ  = 10
 const BATCH_SIZE    = 32
 const MAX_LENGTH    = 64
-const EMBED_DIM     = 64
+const EMBED_DIM     = 128 
 const N_HEADS       = 4
 const HIDDEN_DIM    = 4 * EMBED_DIM
 const EPOCHS        = 50
-const LR            = 1e-3
-const DROPOUT       = 0.1
-const MIN_DOC_LENGTH = 10
+const KL_WARMUP_EPOCHS = 20 # where the KL term is gradually increased
+const LR            = 0.6 * 1e-4
+const DROPOUT       = 0.3 # more aggresive
+const MIN_DOC_LENGTH = 10 # document length in words
 const MIN_CHARS = 200 # minimum paragraph length to be extracted from corpus
 
 
@@ -77,7 +78,7 @@ model = Chain(
     Dense(EMBED_DIM, length(vocab)),
 )
 
-total_params = sum(length, Flux.params(model))
+total_params = sum(p -> length(p), Flux.trainable(model))
 println("Total parameters: $total_params")
 
 
@@ -87,6 +88,7 @@ println("Total parameters: $total_params")
 history = train_decoder!(
     model, train_loader, val_loader;
     epochs = EPOCHS,
+    kl_warmup_epochs = KL_WARMUP_EPOCHS,
     lr     = LR,
 )
 
@@ -104,5 +106,5 @@ println("Model and tokenizer saved")
 
 # generate (one test generation)
 println("\n--- Generation ---")
-generate_samples(model, tokenizer, "he could not remember";
-                 n_samples=5, max_length=40, temperature=0.8f0)
+generate_samples(model, tokenizer, "tell me about yourself";
+                 n_samples=5, max_length=40, temperature=1.2f0)
