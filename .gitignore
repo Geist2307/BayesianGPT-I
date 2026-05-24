@@ -9,3 +9,11 @@ data/*.txt
 
 # OS
 .DS_Store
+
+#Test inference notebook
+Test_inference.ipynb 
+
+#pluto notebook
+notebook.jl 
+
+

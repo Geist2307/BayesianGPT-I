@@ -99,7 +99,7 @@ The variance across those outputs is genuine model uncertainty:
 
 ---
 
-## Results
+## Training Results
 
 Trained on ~8663 lines from only 11 sources.
 2 million parameters, 50 epochs, CPU only (Apple M2, ~2 hours).
@@ -108,12 +108,13 @@ The train-validation split is 90% - 10%.
 
 I used a "warmup" phase where the KL divergence is linearly introduced over 20 epochs : from 0 to 1/N * KL (scaled by the data length)
 
+![Alt text](training_curves.png)
 
 
 **Observations**
 
-- some overfitting, as the gap between training and validation accuracy widens. 
-- not much accuracy gain after 44 epochs, hence 50 epochs is ideal. 
+- No significant overfit, as the gap between training and validation remains very small
+- Not fully converged, so it could be trained for further 20-30 epochs. 
 
 **Three generation modes, same seed:**
 
